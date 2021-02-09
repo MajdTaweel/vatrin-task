@@ -3,7 +3,13 @@ const config = require('config');
 const { refreshToken } = require('../util/jwt');
 
 exports.verify = (req, res, next) => {
-  let token = JSON.parse(req.cookies.token);
+  let token = req.cookies.token;
+
+  if (!token) {
+    return res.status(403).send();
+  }
+
+  token = JSON.parse(req.cookies.token);
 
   const jwtConfig = config.get('jwt');
 

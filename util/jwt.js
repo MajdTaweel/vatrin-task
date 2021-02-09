@@ -20,9 +20,14 @@ const generateToken = (payload) => {
 const refreshToken = (token) => {
   const decodedToken = jwt.decode(token.refreshToken);
   const payload = { username: decodedToken.username };
-  console.log(payload);
 
   return generateToken(payload);
 };
 
-module.exports = { generateToken, refreshToken };
+const getUsername = (token) => {
+  const decodedToken = jwt.decode(token.accessToken);
+
+  return decodedToken.username;
+};
+
+module.exports = { generateToken, refreshToken, getUsername };
