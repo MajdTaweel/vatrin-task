@@ -1,27 +1,25 @@
-var express = require('express');
+const express = require('express');
 const User = require('../model/user');
-var router = express.Router();
+const router = express.Router();
 
 /* GET users listing. */
-router.get('/', async (_, res) => {
+router.get('/', async (_, res, next) => {
   try {
     const users = await User.query();
     res.send(users);
-  } catch (e) {
-    res.status(500);
-    res.send({ message: 'Internal server error' });
+  } catch (err) {
+    next(err);
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req, res, next) => {
   const id = req.params.id;
   let user;
 
   try {
     user = await User.query().findById(id);
-  } catch (e) {
-    res.status(500);
-    res.send({ message: 'Internal server error' });
+  } catch (err) {
+    next(err);
   }
 
   if (!user) {
@@ -32,7 +30,7 @@ router.get('/:id', async (req, res) => {
   res.send(user);
 });
 
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
   const body = req.body;
 
   if (body && body.id) {
@@ -44,45 +42,51 @@ router.post('/', async (req, res) => {
 
   try {
     user = await User.query().insert(body);
-  } catch (e) {
-    res.status(e.statusCode);
-    res.send(e);
+  } catch (err) {
+    if (err.statusCode === 400) {
+      res.status(err.statusCode);
+      res.send(e);
+    } else {
+      next(err);
+    }
   }
 
   res.status(201);
   res.send(user);
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req, res, next) => {
   const id = req.params.id;
   let user = await User.query().findById(id);
+
   if (!user) {
-    res.status(404);
-    res.send({ message: 'Not found' });
+    next({ status: 404, message: 'Not found' });
   }
 
   try {
     const body = req.body;
     user = await User.query().update(body);
-  } catch (e) {
-    res.status(400);
-    res.send(e);
+  } catch (err) {
+    if (err.statusCode === 400) {
+      res.status(err.statusCode);
+      res.send(err);
+    } else {
+      next(err);
+    }
   }
 
   res.status(200);
   res.send(user);
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res, next) => {
   const id = req.params.id;
   try {
     await User.query().deleteById(id);
-  } catch (e) {
-    res.status(500);
-    res.send({ message: 'Internal server error' });
+  } catch (err) {
+    next(err);
   }
-  res.status(203);
-  res.end();
+  res.sendStatus(204);
 });
 
 module.exports = router;
