@@ -7,3 +7,11 @@ db:
   user: vatrin
   password: vatrin
   name: vatrin
+
+jwt:
+  accessToken:
+    secret: secret
+    expiresIn: 120
+  refreshToken:
+    secret: secret
+    expiresIn: 86400

@@ -1,6 +1,10 @@
 const express = require('express');
+const { verify } = require('../middleware/auth');
 const User = require('../model/user');
+const { encodePassword } = require('../util/password-encoder');
 const router = express.Router();
+
+router.use(verify);
 
 /* GET users listing. */
 router.get('/', async (_, res, next) => {
@@ -41,6 +45,10 @@ router.post('/', async (req, res, next) => {
   let user;
 
   try {
+    if (body.password) {
+      body.password = await encodePassword(body.password);
+    }
+
     user = await User.query().insert(body);
   } catch (err) {
     if (err.statusCode === 400) {
