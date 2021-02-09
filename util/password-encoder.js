@@ -8,7 +8,7 @@ const encodePassword = async (plaintextPassword) => {
 };
 
 const comparePassword = async (plaintextPassword, hash) => {
-  bcrypt.compare(plaintextPassword, hash);
+  return bcrypt.compare(plaintextPassword, hash);
 };
 
 module.exports = { encodePassword, comparePassword };

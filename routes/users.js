@@ -1,7 +1,10 @@
 const express = require('express');
+const { verify } = require('../middleware/auth');
 const User = require('../model/user');
 const { encodePassword } = require('../util/password-encoder');
 const router = express.Router();
+
+router.use(verify);
 
 /* GET users listing. */
 router.get('/', async (_, res, next) => {
